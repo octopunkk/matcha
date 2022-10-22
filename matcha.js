@@ -1,4 +1,4 @@
-import env from "./secret";
+const secret = require("./secret");
 
 const Twit = require("twit");
 const fs = require("fs"),
@@ -6,20 +6,20 @@ const fs = require("fs"),
 const SpotifyWebApi = require("spotify-web-api-node");
 
 const spotifyApi = new SpotifyWebApi({
-  clientId: env.spotify.clientId,
-  clientSecret: env.spotify.clientSecret,
-  redirectUri: env.spotify.redirectUri,
+  clientId: secret.env.spotify.clientId,
+  clientSecret: secret.env.spotify.clientSecret,
+  redirectUri: secret.env.spotify.redirectUri,
 });
 
-spotifyApi.setAccessToken(env.spotify.accessToken);
+spotifyApi.setAccessToken(secret.env.spotify.accessToken);
 
-spotifyApi.setRefreshToken(env.spotify.refreshToken);
+spotifyApi.setRefreshToken(secret.env.spotify.refreshToken);
 
 const T = new Twit({
-  consumer_key: env.twitter.consumer_key,
-  consumer_secret: env.twitter.consumer_secret,
-  access_token: env.twitter.access_token,
-  access_token_secret: env.twitter.access_token_secret,
+  consumer_key: secret.env.twitter.consumer_key,
+  consumer_secret: secret.env.twitter.consumer_secret,
+  access_token: secret.env.twitter.access_token,
+  access_token_secret: secret.env.twitter.access_token_secret,
 });
 
 const tweetMySong = (song, album, artist) => {
@@ -80,11 +80,11 @@ const getSpotifyInfo = () => {
           function () {
             console.log("done");
             if (currentInfo !== data.body.item.name) {
-              tweetMySong(
-                data.body.item.name,
-                data.body.item.album.name,
-                data.body.item.album.artists[0].name
-              );
+              // tweetMySong(
+              //   data.body.item.name,
+              //   data.body.item.album.name,
+              //   data.body.item.album.artists[0].name
+              // );
             }
             currentInfo = data.body.item.name;
           }
@@ -111,7 +111,7 @@ let refreshToken = () => {
   );
 };
 
-var minutes = 1;
+var minutes = 0.1;
 
 setInterval(function () {
   refreshToken();
