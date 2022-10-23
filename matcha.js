@@ -59,74 +59,65 @@ const doEverything = () => {
   getSpotifyInfo();
 };
 
-const download = function (uri, filename, callback) {
-  request.head(uri, function (err, res, body) {
-    if (res) {
-      console.log("content-type:", res?.headers["content-type"]);
-      console.log("content-length:", res?.headers["content-length"]);
-      request(uri).pipe(fs.createWriteStream(filename)).on("close", callback);
-    }
+const download = (uri, filename) => {
+  return new Promise((resolve, reject) => {
+    request.head(uri, function (err, res, body) {
+      if (res) {
+        request(uri)
+          .pipe(fs.createWriteStream(filename))
+          .on("close", () => resolve());
+      } else return reject(err);
+    });
   });
 };
+
 let currentInfo = "";
 
-const getSpotifyInfo = () => {
-  spotifyApi.getMyCurrentPlayingTrack().then(
-    function (data) {
-      if (data?.body?.item?.name) {
-        console.log("Now playing: " + data.body.item.name);
-        download(
-          data.body.item.album.images[0].url,
-          "current_album.png",
-          function () {
-            console.log("done");
-            if (currentInfo !== data.body.item.name) {
-              spotifyApi.getArtist(data.body.item.album.artists[0].id).then(
-                function (genredata) {
-                  console.log("Genre information", genredata.body.genres[0]);
-                  console.log(data.body.item);
-                  sql.addSong(
-                    data.body.item.name,
-                    data.body.item.album.artists[0].name,
-                    genredata.body.genres[0]
-                  );
-                  // tweetMySong(
-                  //   data.body.item.name,
-                  //   data.body.item.album.name,
-                  //   data.body.item.album.artists[0].name
-                  // );
-                },
-                function (err) {
-                  console.error(err);
-                }
-              );
-            }
-            currentInfo = data.body.item.name;
-          }
-        );
-      }
-    },
-    function (err) {
-      console.log("Something went wrong!", err);
+async function getSpotifyInfo() {
+  try {
+    const data = await spotifyApi.getMyCurrentPlayingTrack();
+    if (!data.body.item.album.artists[0].id || !data.body.item.name)
+      throw new Error(`Error : didn't fetch data`);
+    const genredata = await spotifyApi.getArtist(
+      data.body.item.album.artists[0].id
+    );
+    if (!genredata) throw new Error(`Error : didn't fetch genre data`);
+    console.log("Now playing: " + data.body.item.name);
+    const downloadOK = await download(
+      data.body.item.album.images[0].url,
+      "current_album.png"
+    );
+
+    if (currentInfo !== data.body.item.name && downloadOK) {
+      sql.addSong(
+        data.body.item.name,
+        data.body.item.album.artists[0].name,
+        genredata.body.genres[0]
+      );
+      // tweetMySong(
+      //   data.body.item.name,
+      //   data.body.item.album.name,
+      //   data.body.item.album.artists[0].name
+      // );
     }
-  );
-};
+    currentInfo = data.body.item.name;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
-let refreshToken = () => {
-  spotifyApi.refreshAccessToken().then(
-    function (data) {
-      console.log("The access token has been refreshed!");
+async function refreshToken() {
+  try {
+    const data = await spotifyApi.refreshAccessToken();
+    console.log("The access token has been refreshed!");
+    // Save the access token so that it's used in future calls
+    spotifyApi.setAccessToken(data.body["access_token"]);
+  } catch (err) {
+    console.log("Could not refresh access token", err);
+  }
+}
 
-      // Save the access token so that it's used in future calls
-      spotifyApi.setAccessToken(data.body["access_token"]);
-    },
-    function (err) {
-      console.log("Could not refresh access token", err);
-    }
-  );
-};
-
-var minutes = 0.1;
+const minutes = 0.1;
 
 setInterval(function () {
   refreshToken();
