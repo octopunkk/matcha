@@ -1,4 +1,5 @@
 const secret = require("./secret");
+const sql = require("./sql");
 
 const Twit = require("twit");
 const fs = require("fs"),
@@ -80,11 +81,25 @@ const getSpotifyInfo = () => {
           function () {
             console.log("done");
             if (currentInfo !== data.body.item.name) {
-              // tweetMySong(
-              //   data.body.item.name,
-              //   data.body.item.album.name,
-              //   data.body.item.album.artists[0].name
-              // );
+              spotifyApi.getArtist(data.body.item.album.artists[0].id).then(
+                function (genredata) {
+                  console.log("Genre information", genredata.body.genres[0]);
+                  console.log(data.body.item);
+                  sql.addSong(
+                    data.body.item.name,
+                    data.body.item.album.artists[0].name,
+                    genredata.body.genres[0]
+                  );
+                  // tweetMySong(
+                  //   data.body.item.name,
+                  //   data.body.item.album.name,
+                  //   data.body.item.album.artists[0].name
+                  // );
+                },
+                function (err) {
+                  console.error(err);
+                }
+              );
             }
             currentInfo = data.body.item.name;
           }

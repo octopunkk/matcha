@@ -2,19 +2,26 @@ const sql = require("./db.js");
 
 async function displayMusic() {
   const music = await sql.sql`
-  
-  select * from music
+    select * from music
   `;
   console.log(music);
   return music;
 }
 
-async function addSong(id, song, artist, genre) {
+async function deleteAllMusic() {
+  const music = await sql.sql`
+    delete from music
+  `;
+  console.log(music);
+  return music;
+}
+
+async function addSong(song, artist, genre) {
   const xs = await sql.sql`
   insert into music (
-    id, name, artist, genre, date
+    name, artist, genre, date
   ) values (
-    ${id}, ${song}, ${artist}, ${genre}, current_date
+    ${song}, ${artist}, ${genre}, current_date
   )
 
   returning *
@@ -22,6 +29,8 @@ async function addSong(id, song, artist, genre) {
   return xs;
 }
 
-console.log(displayMusic());
-addSong(3, "All Along The Watchtower", "Jimi Hendrix", "psychedelic rock");
-console.log(displayMusic());
+// deleteAllMusic();
+displayMusic();
+// addSong("Someday", "The Strokes", "alternative rock");
+
+module.exports = { addSong };
