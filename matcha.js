@@ -87,12 +87,13 @@ async function getSpotifyInfo() {
       data.body.item.album.images[0].url,
       "current_album.png"
     );
-
     if (currentInfo !== data.body.item.name && downloadOK) {
       sql.addSong(
         data.body.item.name,
         data.body.item.album.artists[0].name,
-        genredata.body.genres[0]
+        genredata.body.genres[0],
+        data.body.item.id,
+        data.body.item.duration_ms
       );
       // tweetMySong(
       //   data.body.item.name,

@@ -16,12 +16,12 @@ async function deleteAllMusic() {
   return music;
 }
 
-async function addSong(song, artist, genre) {
+async function addSong(song, artist, genre, id, duration_ms) {
   const xs = await sql.sql`
   insert into music (
-    name, artist, genre, date
+    name, artist, genre, date, id, duration_ms
   ) values (
-    ${song}, ${artist}, ${genre}, current_date
+    ${song}, ${artist}, ${genre}, current_date, ${id}, ${duration_ms}
   )
 
   returning *
