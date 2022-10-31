@@ -1,0 +1,15 @@
+{
+  "name": "matcha",
+  "version": "1.0.0",
+  "description": "Tweet, save  and make stats of every song listened on spotify",
+  "author": "Anaïs Derue <hello@anaisderue.com>",
+  "main": "matcha.js",
+  "scripts": {
+    "start": "node matcha.js"
+  },
+  "dependencies": {
+    "twit": "^2.2.11",
+    "spotify-web-api-node": "^5.0.2",
+    "postgres": "^3.3.1"
+  }
+}

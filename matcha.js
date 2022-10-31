@@ -1,4 +1,3 @@
-const secret = require("./secret");
 const sql = require("./sql");
 
 const Twit = require("twit");
@@ -7,20 +6,20 @@ const fs = require("fs"),
 const SpotifyWebApi = require("spotify-web-api-node");
 
 const spotifyApi = new SpotifyWebApi({
-  clientId: secret.env.spotify.clientId,
-  clientSecret: secret.env.spotify.clientSecret,
-  redirectUri: secret.env.spotify.redirectUri,
+  clientId: process.env.spotify_clientId,
+  clientSecret: process.env.spotify_clientSecret,
+  redirectUri: process.env.spotify_redirectUri || "http://localhost:8888/",
 });
 
-spotifyApi.setAccessToken(secret.env.spotify.accessToken);
+spotifyApi.setAccessToken(process.env.spotify_accessToken);
 
-spotifyApi.setRefreshToken(secret.env.spotify.refreshToken);
+spotifyApi.setRefreshToken(process.env.spotify_refreshToken);
 
 const T = new Twit({
-  consumer_key: secret.env.twitter.consumer_key,
-  consumer_secret: secret.env.twitter.consumer_secret,
-  access_token: secret.env.twitter.access_token,
-  access_token_secret: secret.env.twitter.access_token_secret,
+  consumer_key: process.env.twitter_consumer_key,
+  consumer_secret: process.env.twitter_consumer_secret,
+  access_token: process.env.twitter_access_token,
+  access_token_secret: process.env.twitter_access_token_secret,
 });
 
 const tweetMySong = (song, album, artist) => {

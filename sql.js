@@ -1,7 +1,12 @@
-const sql = require("./db.js");
+const postgres = require("postgres");
+
+const db = postgres(
+  process.env.DATABASE_URL ||
+    "postgres://postgres:anaisdocker@localhost:5432/postgres"
+);
 
 async function displayMusic() {
-  const music = await sql.sql`
+  const music = await db.sql`
     select * from music
   `;
   console.log(music);
@@ -9,19 +14,19 @@ async function displayMusic() {
 }
 
 async function deleteAllMusic() {
-  const music = await sql.sql`
+  const music = await db.sql`
     delete from music
   `;
   console.log(music);
   return music;
 }
 
-async function addSong(song, artist, genre, id, duration_ms) {
-  const xs = await sql.sql`
+async function addSong(song, artist, genre, spotify_id, duration_ms) {
+  const xs = await db.sql`
   insert into music (
-    name, artist, genre, date, id, duration_ms
+    name, artist, genre, date, spotify_id, duration_ms
   ) values (
-    ${song}, ${artist}, ${genre}, current_date, ${id}, ${duration_ms}
+    ${song}, ${artist}, ${genre}, current_date, ${spotify_id}, ${duration_ms}
   )
 
   returning *
