@@ -5,11 +5,15 @@
   "author": "Anaïs Derue <hello@anaisderue.com>",
   "main": "matcha.js",
   "scripts": {
-    "start": "node matcha.js"
+    "start": "npm run migrate up && node matcha.js",
+    "migrate": "ley"
   },
   "dependencies": {
-    "twit": "^2.2.11",
+    "postgres": "^3.3.1",
     "spotify-web-api-node": "^5.0.2",
-    "postgres": "^3.3.1"
+    "twit": "^2.2.11"
+  },
+  "devDependencies": {
+    "ley": "^0.8.1"
   }
 }

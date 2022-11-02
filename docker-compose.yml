@@ -10,5 +10,21 @@ services:
       - "5432:5432"
     volumes:
       - database-data:/var/lib/postgresql/data/
+  nodejs:
+    build: .
+    environment:
+      - spotify_clientId
+      - spotify_clientSecret
+      - spotify_redirectUri
+      - spotify_accessToken
+      - spotify_refreshToken
+      - twitter_consumer_key
+      - twitter_consumer_secret
+      - twitter_access_token
+      - twitter_access_token_secret
+      - DATABASE_URL
+    depends_on:
+      - database
+    restart: unless-stopped
 volumes:
   database-data:

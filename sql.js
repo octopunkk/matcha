@@ -6,7 +6,7 @@ const db = postgres(
 );
 
 async function displayMusic() {
-  const music = await db.sql`
+  const music = await db`
     select * from music
   `;
   console.log(music);
@@ -14,7 +14,7 @@ async function displayMusic() {
 }
 
 async function deleteAllMusic() {
-  const music = await db.sql`
+  const music = await db`
     delete from music
   `;
   console.log(music);
@@ -22,11 +22,11 @@ async function deleteAllMusic() {
 }
 
 async function addSong(song, artist, genre, spotify_id, duration_ms) {
-  const xs = await db.sql`
+  const xs = await db`
   insert into music (
-    name, artist, genre, date, spotify_id, duration_ms
+    name, artist, genre, spotify_id, duration_ms
   ) values (
-    ${song}, ${artist}, ${genre}, current_date, ${spotify_id}, ${duration_ms}
+    ${song}, ${artist}, ${genre}, ${spotify_id}, ${duration_ms}
   )
 
   returning *
