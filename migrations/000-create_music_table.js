@@ -1,12 +1,4 @@
-const postgres = require("postgres");
-
-const DB = postgres({
-  host: process.env.PGHOST,
-  username: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-});
-
-exports.up = async function () {
+exports.up = async function (DB) {
   await DB`
     CREATE TABLE music (
       ID SERIAL PRIMARY KEY,
@@ -21,6 +13,6 @@ exports.up = async function () {
   `;
 };
 
-exports.down = async function () {
+exports.down = async function (DB) {
   await DB`DROP TABLE music`;
 };
