@@ -1,9 +1,12 @@
 const postgres = require("postgres");
 
-const db = postgres(
-  process.env.DATABASE_URL ||
-    "postgres://postgres:anaisdocker@localhost:5432/postgres"
-);
+const db = postgres({
+  host: process.env.PGHOST,
+  port: 5432,
+  username: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+});
+console.log(db);
 
 async function displayMusic() {
   const music = await db`
@@ -34,8 +37,4 @@ async function addSong(song, artist, genre, spotify_id, duration_ms) {
   return xs;
 }
 
-// deleteAllMusic();
-displayMusic();
-// addSong("Someday", "The Strokes", "alternative rock");
-
-module.exports = { addSong };
+module.exports = { addSong, displayMusic };

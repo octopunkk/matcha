@@ -82,23 +82,22 @@ async function getSpotifyInfo() {
     );
     if (!genredata) throw new Error(`Error : didn't fetch genre data`);
     console.log("Now playing: " + data.body.item.name);
-    const downloadOK = await download(
-      data.body.item.album.images[0].url,
-      "current_album.png"
-    );
-    if (currentInfo !== data.body.item.name && downloadOK) {
-      sql.addSong(
+    if (currentInfo !== data.body.item.name) {
+      await download(data.body.item.album.images[0].url, "current_album.png");
+
+      await sql.addSong(
         data.body.item.name,
         data.body.item.album.artists[0].name,
         genredata.body.genres[0],
         data.body.item.id,
         data.body.item.duration_ms
       );
-      // tweetMySong(
-      //   data.body.item.name,
-      //   data.body.item.album.name,
-      //   data.body.item.album.artists[0].name
-      // );
+      sql.displayMusic();
+      tweetMySong(
+        data.body.item.name,
+        data.body.item.album.name,
+        data.body.item.album.artists[0].name
+      );
     }
     currentInfo = data.body.item.name;
   } catch (err) {
@@ -117,7 +116,7 @@ async function refreshToken() {
   }
 }
 
-const minutes = 0.1;
+const minutes = 0.5;
 
 setInterval(function () {
   refreshToken();

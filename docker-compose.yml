@@ -22,7 +22,9 @@ services:
       - twitter_consumer_secret
       - twitter_access_token
       - twitter_access_token_secret
-      - DATABASE_URL
+      - PGHOST
+      - PGUSER
+      - PGPASSWORD
     depends_on:
       - database
     restart: unless-stopped

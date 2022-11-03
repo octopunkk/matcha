@@ -5,10 +5,13 @@
   "author": "Anaïs Derue <hello@anaisderue.com>",
   "main": "matcha.js",
   "scripts": {
-    "start": "npm run migrate up && node matcha.js",
+    "start": "dotenv npm run migrate up && dotenv node src/matcha.js",
+    "start:local": "dotenv -c -- npm run migrate up && dotenv -c  -- node src/matcha.js",
+    "down": "dotenv -c -- npm run migrate down",
     "migrate": "ley"
   },
   "dependencies": {
+    "dotenv-cli": "^6.0.0",
     "postgres": "^3.3.1",
     "spotify-web-api-node": "^5.0.2",
     "twit": "^2.2.11"

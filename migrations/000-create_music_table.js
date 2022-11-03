@@ -1,15 +1,16 @@
 const postgres = require("postgres");
 
-const DB = postgres(
-  process.env.DATABASE_URL ||
-    "postgres://postgres:anaisdocker@localhost:5432/postgres"
-);
+const DB = postgres({
+  host: process.env.PGHOST,
+  username: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+});
 
 exports.up = async function () {
   await DB`
     CREATE TABLE music (
       ID SERIAL PRIMARY KEY,
-      song text NOT NULL,
+      name text NOT NULL,
       artist text NOT NULL,
       genre text NOT NULL,
       date DATE NOT NULL default now(),

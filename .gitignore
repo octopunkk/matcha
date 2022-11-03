@@ -2,3 +2,4 @@ secret.js
 current_album.png
 node_modules
 .env
+.env.local
