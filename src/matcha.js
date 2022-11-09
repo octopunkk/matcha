@@ -93,11 +93,11 @@ async function getSpotifyInfo() {
         data.body.item.duration_ms
       );
       sql.displayMusic();
-      tweetMySong(
-        data.body.item.name,
-        data.body.item.album.name,
-        data.body.item.album.artists[0].name
-      );
+      // tweetMySong(
+      //   data.body.item.name,
+      //   data.body.item.album.name,
+      //   data.body.item.album.artists[0].name
+      // );
     }
     currentInfo = data.body.item.name;
   } catch (err) {
