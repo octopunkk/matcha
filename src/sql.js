@@ -6,7 +6,6 @@ const db = postgres({
   username: process.env.PGUSER,
   password: process.env.PGPASSWORD,
 });
-console.log(db);
 
 async function displayMusic() {
   const music = await db`
