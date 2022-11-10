@@ -40,20 +40,29 @@ async function getTopArtists(limit, interval) {
 }
 
 async function getTopTracks(limit, interval) {
-  const topTrack = await db`
+  const topTracks = await db`
   select name, count(*) as counting from music
   where date > now() -  ${interval}::interval
   group by name
   order by counting desc
   limit ${limit};
   `;
-  return topTrack;
+  return topTracks;
 }
-
+async function getTopGenres(limit, interval) {
+  const topGenres = await db`
+  select genre, count(*) as counting from music
+  where date > now() -  ${interval}::interval
+  group by genre
+  order by counting desc
+  limit ${limit};
+  `;
+  return topGenres;
+}
 async function getListenTime(interval) {
   const listen_time = await db`
   select sum(duration_ms) as listen_time from music
-  where date > now() -  ${interval}::interval
+  where date > now() -  ${interval}::interval;
   `;
   return listen_time;
 }
@@ -66,6 +75,15 @@ async function getBusiestHour(interval) {
   order by listened_on_count desc
   limit 1;
   `;
+  return busiest_hour;
+}
+
+async function getSongCount(interval) {
+  const songCount = await db`
+  select count(*) from music
+  where date > now() -  ${interval}::interval;
+  `;
+  return songCount;
 }
 
 module.exports = {
@@ -75,4 +93,5 @@ module.exports = {
   getTopTracks,
   getBusiestHour,
   getListenTime,
+  getSongCount,
 };

@@ -54,6 +54,23 @@ const tweetMySong = (song, album, artist) => {
   console.log(`Tweet about ${song} sent !`);
 };
 
+const tweetMyStats = (
+  interval,
+  topArtists,
+  topTrack,
+  listen_time,
+  busiest_hour
+) => {
+  const durée = interval == "month" ? "du mois" : "de la semaine";
+  T.post(
+    "statuses/update",
+    { status: "Mes stats du " },
+    function (err, data, response) {
+      console.log(data);
+    }
+  );
+};
+
 async function doEverything() {
   getSpotifyInfo();
   console.log(await sql.getTopArtists());
