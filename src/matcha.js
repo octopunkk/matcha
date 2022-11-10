@@ -54,9 +54,10 @@ const tweetMySong = (song, album, artist) => {
   console.log(`Tweet about ${song} sent !`);
 };
 
-const doEverything = () => {
+async function doEverything() {
   getSpotifyInfo();
-};
+  console.log(await sql.getTopArtists());
+}
 
 const download = (uri, filename) => {
   return new Promise((resolve, reject) => {
@@ -93,11 +94,11 @@ async function getSpotifyInfo() {
         data.body.item.duration_ms
       );
       sql.displayMusic();
-      tweetMySong(
-        data.body.item.name,
-        data.body.item.album.name,
-        data.body.item.album.artists[0].name
-      );
+      // tweetMySong(
+      //   data.body.item.name,
+      //   data.body.item.album.name,
+      //   data.body.item.album.artists[0].name
+      // );
     }
     currentInfo = data.body.item.name;
   } catch (err) {
@@ -115,7 +116,7 @@ async function refreshToken() {
     console.log("Could not refresh access token", err);
   }
 }
-const minutes = 0.5;
+const minutes = 0.05;
 
 setInterval(function () {
   refreshToken();
