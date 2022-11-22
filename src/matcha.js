@@ -79,7 +79,7 @@ const tweetMySong = (song, album, artist) => {
 
 async function getMyStats(interval) {
   const stats = {
-    topArtists: (await sql.getTopArtists(5, interval)).map((e) => {
+    topArtists: (await sql.getTopArtists(6, interval)).map((e) => {
       e.counting = msToBestFormat(Number(e.counting));
       return e;
     }),
@@ -95,6 +95,7 @@ async function getMyStats(interval) {
 }
 
 async function generateStatsImg(interval) {
+  // API CALLS
   const stats = await getMyStats(interval);
   await refreshToken();
   const topTrackURL = (await spotifyApi.getTrack(stats.topTrack.spotify_id))
@@ -109,64 +110,119 @@ async function generateStatsImg(interval) {
       return spotifyApi.getArtist(artistData.body.artists[0].id);
     })
   );
+
+  // BACKGROUND
   const WIDTH = 1000;
   const HEIGHT = 1000;
   const canvas = createCanvas(WIDTH, HEIGHT);
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = "#9381ff";
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
-  // Write "Stats de la semaine/ du mois :"
+
+  // TITLE
   ctx.font = "bold 40pt ";
   ctx.textAlign = "center";
   ctx.fillStyle = "#f8f7ff";
   ctx.fillText(
     `Stats ${interval == "month" ? "du mois" : "de la semaine"}`,
     500,
-    100
+    80
   );
-  ctx.font = " 25pt ";
 
+  // SONG COUNT + LISTEN TIME
+  ctx.font = " 25pt ";
   ctx.fillText(
     `${stats.songCount} sons écoutés, soit ${stats.listenTime} de musique`,
     500,
-    200
+    130
   );
+
+  // TOP TRACK
   ctx.font = "22pt";
   ctx.textAlign = "center";
 
-  ctx.fillText(
-    `Top track : ${stats.topTrack.name} avec ${stats.topTrack.counting} écoutes`,
-    500,
-    250,
-    900
-  );
+  const gradient = ctx.createLinearGradient(0, 230, 0, 490);
+  gradient.addColorStop(0.6, "rgba(0,0,0,0)");
+  gradient.addColorStop(1, "black");
+  const topTrackImg = await loadImage(await downloadAsBuffer(topTrackURL));
+  ctx.drawImage(topTrackImg, 620, 230, 260, 260);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(620, 230, 260, 260);
+  ctx.fillStyle = "#f8f7ff";
+  ctx.textAlign = "center";
   ctx.font = "bold 22pt ";
-  ctx.fillText(`Artistes les plus écoutés`, 250, 350, 900);
-  stats.topArtists.forEach((artist, i) => {
-    ctx.fillText(`${artist.artist}`, 300, 420 + 110 * i, 900);
-    ctx.font = "18pt ";
-    ctx.fillText(`${artist.counting} d'écoute`, 300, 420 + 110 * i + 40, 900);
-    ctx.font = "bold 22pt ";
-  });
-  for (let i = 0; i < 5; i++) {
+  ctx.fillText(`Top track`, 750, 210, 900);
+  ctx.font = "bold 18pt ";
+  ctx.textAlign = "left";
+
+  ctx.fillText(`${stats.topTrack.name}`, 640, 445, 250);
+  ctx.font = "14pt ";
+  ctx.fillText(`${stats.topTrack.counting} écoutes`, 640, 470, 250);
+
+  // TOP ARTISTS
+  ctx.fillStyle = "#f8f7ff";
+  ctx.font = "bold 24pt ";
+  ctx.textAlign = "center";
+
+  ctx.fillText(`Artistes les plus écoutés`, 265, 210);
+
+  for (let i = 0; i < 6; i++) {
     const url = topAtristsURLs[i].body.images[0].url;
     const artistImg = await loadImage(await downloadAsBuffer(url));
-    ctx.drawImage(artistImg, 50, 380 + 110 * i, 100, 100);
+    ctx.drawImage(
+      artistImg,
+      20 + (i % 2) * 260,
+      230 + 128 * i - 128 * (i % 2),
+      250,
+      250
+    );
+    const gradient = ctx.createLinearGradient(
+      0,
+      230 + 128 * i - 128 * (i % 2),
+      0,
+      230 + 128 * i - 128 * (i % 2) + 250
+    );
+    gradient.addColorStop(0.6, "rgba(0,0,0,0)");
+    gradient.addColorStop(1, "black");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(20 + (i % 2) * 260, 230 + 128 * i - 128 * (i % 2), 250, 250);
   }
+  ctx.fillStyle = "#f8f7ff";
 
-  ctx.font = "bold 22pt ";
+  ctx.textAlign = "left";
 
-  ctx.fillText(`Genres les plus écoutés`, 750, 350, 900);
-
-  stats.topGenres.forEach((genre, i) => {
-    ctx.fillText(`${genre.genre}`, 750, 420 + 110 * i, 900);
-    ctx.font = "18pt ";
-    ctx.fillText(`${genre.counting} écoutes`, 750, 420 + 110 * i + 40, 900);
-    ctx.font = "bold 22pt ";
+  stats.topArtists.forEach((artist, i) => {
+    ctx.font = "bold 18pt ";
+    ctx.fillText(
+      `${artist.artist}`,
+      40 + (i % 2) * 260,
+      435 + 128 * i - 128 * (i % 2),
+      240
+    );
+    ctx.font = "14pt ";
+    ctx.fillText(
+      `${artist.counting} d'écoute`,
+      40 + (i % 2) * 260,
+      460 + 128 * i - 128 * (i % 2),
+      240
+    );
   });
 
-  const topTrackImg = await loadImage(await downloadAsBuffer(topTrackURL));
-  ctx.drawImage(topTrackImg, 50, 200, 100, 100);
+  // TOP GENRES
+  ctx.font = "bold 24pt ";
+  ctx.textAlign = "center";
+
+  ctx.fillText(`Genres les plus écoutés`, 750, 530);
+
+  stats.topGenres.forEach((genre, i) => {
+    ctx.font = "bold 20pt ";
+
+    ctx.fillText(`${genre.genre}`, 750, 580 + 90 * i, 400);
+    ctx.font = "18pt ";
+    ctx.fillText(`${genre.counting} écoutes`, 750, 580 + 90 * i + 40, 400);
+  });
+
+  // SAVE IMG
   const buffer = canvas.toBuffer("image/png");
   fs.writeFileSync("./current_stats.png", buffer);
 }
