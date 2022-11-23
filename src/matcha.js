@@ -116,13 +116,26 @@ async function generateStatsImg(interval) {
   const HEIGHT = 1000;
   const canvas = createCanvas(WIDTH, HEIGHT);
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#9381ff";
+  const palettes = [
+    { bg: "#9381ff", txt: "#f8f7ff" },
+    { bg: "#7400b8", txt: "#f8f7ff" },
+    { bg: "#2a9d8f", txt: "#f8f7ff" },
+    { bg: "#f77f00", txt: "#f8f7ff" },
+    { bg: "#ef476f", txt: "#f8f7ff" },
+    { bg: "#6fffe9", txt: "#22223b" },
+    { bg: "#ffd6a5", txt: "#22223b" },
+    { bg: "#ffadad", txt: "#22223b" },
+    { bg: "#ffc6ff", txt: "#22223b" },
+    { bg: "#2b2d42", txt: "#f8f7ff" },
+  ];
+  const idx = Math.floor(Math.random() * 10);
+  ctx.fillStyle = palettes[idx].bg;
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
   // TITLE
   ctx.font = "bold 40pt ";
   ctx.textAlign = "center";
-  ctx.fillStyle = "#f8f7ff";
+  ctx.fillStyle = palettes[idx].txt;
   ctx.fillText(
     `Stats ${interval == "month" ? "du mois" : "de la semaine"}`,
     500,
@@ -141,26 +154,27 @@ async function generateStatsImg(interval) {
   ctx.font = "22pt";
   ctx.textAlign = "center";
 
-  const gradient = ctx.createLinearGradient(0, 230, 0, 490);
+  const gradient = ctx.createLinearGradient(0, 230, 0, 530);
   gradient.addColorStop(0.6, "rgba(0,0,0,0)");
   gradient.addColorStop(1, "black");
   const topTrackImg = await loadImage(await downloadAsBuffer(topTrackURL));
-  ctx.drawImage(topTrackImg, 620, 230, 260, 260);
+  ctx.drawImage(topTrackImg, 620, 230, 300, 300);
   ctx.fillStyle = gradient;
-  ctx.fillRect(620, 230, 260, 260);
-  ctx.fillStyle = "#f8f7ff";
+  ctx.fillRect(620, 230, 300, 300);
+  ctx.fillStyle = palettes[idx].txt;
   ctx.textAlign = "center";
   ctx.font = "bold 22pt ";
-  ctx.fillText(`Top track`, 750, 210, 900);
+  ctx.fillText(`Top track`, 770, 210);
   ctx.font = "bold 18pt ";
   ctx.textAlign = "left";
+  ctx.fillStyle = "#f8f7ff";
 
-  ctx.fillText(`${stats.topTrack.name}`, 640, 445, 250);
+  ctx.fillText(`${stats.topTrack.name}`, 640, 485, 280);
   ctx.font = "14pt ";
-  ctx.fillText(`${stats.topTrack.counting} écoutes`, 640, 470, 250);
+  ctx.fillText(`${stats.topTrack.counting} écoutes`, 640, 510, 280);
 
   // TOP ARTISTS
-  ctx.fillStyle = "#f8f7ff";
+  ctx.fillStyle = palettes[idx].txt;
   ctx.font = "bold 24pt ";
   ctx.textAlign = "center";
 
@@ -211,15 +225,15 @@ async function generateStatsImg(interval) {
   // TOP GENRES
   ctx.font = "bold 24pt ";
   ctx.textAlign = "center";
+  ctx.fillStyle = palettes[idx].txt;
 
-  ctx.fillText(`Genres les plus écoutés`, 750, 530);
+  ctx.fillText(`Genres les plus écoutés`, 770, 600);
 
   stats.topGenres.forEach((genre, i) => {
-    ctx.font = "bold 20pt ";
-
-    ctx.fillText(`${genre.genre}`, 750, 580 + 90 * i, 400);
-    ctx.font = "18pt ";
-    ctx.fillText(`${genre.counting} écoutes`, 750, 580 + 90 * i + 40, 400);
+    ctx.font = "bold 18pt ";
+    ctx.fillText(`${genre.genre}`, 770, 650 + 70 * i, 400);
+    ctx.font = "14pt ";
+    ctx.fillText(`${genre.counting} écoutes`, 770, 650 + 70 * i + 30, 400);
   });
 
   // SAVE IMG
