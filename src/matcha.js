@@ -4,7 +4,7 @@ const fs = require("fs"),
   request = require("request");
 const SpotifyWebApi = require("spotify-web-api-node");
 const schedule = require("node-schedule");
-const { createCanvas, loadImage } = require("canvas");
+const { createCanvas, loadImage } = require("@napi-rs/canvas");
 
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.spotify_clientId,

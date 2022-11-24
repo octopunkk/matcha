@@ -29,13 +29,20 @@ async function addSong(song, artist, genre, spotify_id, duration_ms) {
 
 async function getTopArtists(limit, interval) {
   const topArtists = await db`
-  select artist, spotify_id, sum(duration_ms) as counting from music
+  select artist, array_agg(spotify_id) as track_ids, sum(duration_ms) as counting from music
   where date > now() - ${1 + interval}::interval
-  group by artist, spotify_id
+  group by artist
   order by counting desc
   limit ${limit};
   `;
-  return topArtists;
+  console.log(topArtists);
+  return topArtists.map((artist) => {
+    return {
+      artist: artist.artist,
+      counting: artist.counting,
+      spotify_id: artist.track_ids[0],
+    };
+  });
   // topArtists =  [{ artist: 'The Cure', counting: '3' },{ artist: 'Tyler, The Creator', counting: '2' }]
 }
 
