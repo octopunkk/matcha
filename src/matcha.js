@@ -241,48 +241,38 @@ async function generateStatsImg(interval) {
   fs.writeFileSync("./current_stats.png", buffer);
 }
 
-/* stats should look like : 
-{
-  durée : "du mois" / "de la semaine",
-  songCount : '46',
-  listenTime : "7 heures",
-  topTrack : {name: "Machu Picchu", counting: 5 },
-  topArtists : [{artist : "Arctic Monkeys", counting : "30 minutes"}, ...] (5 names)
-  topGenres: Result(5) [
-    { genre: 'alternative dance', counting: '21' },
-    { genre: 'melodic metalcore', counting: '15' },
-    { genre: 'baroque pop', counting: '7' },
-    { genre: 'big beat', counting: '6' },
-    { genre: 'disco house', counting: '3' }
-  ]
+async function tweetMyStats(interval) {
+  await generateStatsImg(interval);
+  const b64content = fs.readFileSync("./current_stats.png", {
+    encoding: "base64",
+  });
+  T.post(
+    "media/upload",
+    { media_data: b64content },
+    function (err, data, response) {
+      var mediaIdStr = data.media_id_string;
+      var meta_params = { media_id: mediaIdStr };
+
+      T.post(
+        "media/metadata/create",
+        meta_params,
+        function (err, data, response) {
+          if (!err) {
+            var params = {
+              status: ``,
+              media_ids: [mediaIdStr],
+            };
+
+            T.post("statuses/update", params, function (err, data, response) {
+              console.log(data);
+            });
+          }
+        }
+      );
+    }
+  );
+  console.log(`Stats tweet sent !`);
 }
-*/
-
-const tweetMyStats = (
-  interval,
-  topArtists,
-  topTrack,
-  listen_time,
-  songCount,
-  topGenres
-) => {
-  const durée = interval == "month" ? "du mois" : "de la semaine";
-  // T.post(
-  //   "statuses/update",
-  //   {
-  //     status: `Mes stats ${durée} : \n
-  //   J'ai écouté ${songCount.counting} soit ${listen_time} de musique \n
-  //   Top son : ${topTrack.name} \n
-  //   Top artiste : ${topArtists.artist}  \n
-  //   Top genre : ${topGenres.genre}
-  //   `,
-  //   },
-
-  //   function (err, data, response) {
-  //     console.log(data);
-  //   }
-  // );
-};
 
 async function doEverything() {
   getSpotifyInfo();
@@ -334,11 +324,11 @@ async function getSpotifyInfo() {
         data.body.item.duration_ms
       );
       sql.displayMusic();
-      // tweetMySong(
-      //   data.body.item.name,
-      //   data.body.item.album.name,
-      //   data.body.item.album.artists[0].name
-      // );
+      tweetMySong(
+        data.body.item.name,
+        data.body.item.album.name,
+        data.body.item.album.artists[0].name
+      );
     }
     currentInfo = data.body.item.name;
   } catch (err) {
@@ -356,23 +346,14 @@ async function refreshToken() {
     console.log("Could not refresh access token", err);
   }
 }
-const minutes = 0.05;
+const minutes = 0.5;
 
-// setInterval(function () {
-//   refreshToken();
-//   doEverything();
-// }, minutes * 60 * 1000);
+setInterval(function () {
+  refreshToken();
+  doEverything();
+}, minutes * 60 * 1000);
 
-generateStatsImg("week");
-// schedule.scheduleJob("0 0 * * *", async () => {
-//   const interval = "week";
-//   const limit = 1;
-//   tweetMyStats(
-//     interval,
-//     await sql.getTopArtists(limit, interval),
-//     await sql.getTopTracks(limit, interval),
-//     await sql.getListenTime(interval),
-//     await sql.getSongCount(interval),
-//     await sql.getTopGenres(limit, interval)
-//   );
-// });
+schedule.scheduleJob("00 18 * * 7", async () => {
+  const interval = "week";
+  tweetMyStats(interval);
+});
