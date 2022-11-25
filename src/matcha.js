@@ -353,7 +353,7 @@ setInterval(function () {
   doEverything();
 }, minutes * 60 * 1000);
 
-schedule.scheduleJob("00 18 * * 7", async () => {
+schedule.scheduleJob("20 18 * * 5", async () => {
   const interval = "week";
   tweetMyStats(interval);
 });
