@@ -16,7 +16,6 @@ async function displayMusic() {
 }
 
 async function addSong(currentPlayingTrack) {
-  // don't name a variable the same name as your function, this can cause problems -> OK
   const q = await db`
   insert into music (
     name, artist, genre, spotify_id, duration_ms
@@ -29,8 +28,6 @@ async function addSong(currentPlayingTrack) {
 }
 
 async function getTopArtists(limit, interval) {
-  // interval is a string ? either "week" or "month" ? if yes, why doing `now() - ${1 + interval}` in the SQL query ? you should never add a number to a string, what do you want to do?
-  // `now() - "1 ${interval}"::interval -> OK
   const topArtists = await db`
   select artist, array_agg(spotify_id) as track_ids, sum(duration_ms) as listen_duration from music
   where date > (now() - ${"1 " + interval}::interval)
