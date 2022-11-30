@@ -14,20 +14,21 @@ services:
   nodejs:
     build: .
     environment:
-      - spotify_clientId
-      - spotify_clientSecret
-      - spotify_redirectUri
-      - spotify_accessToken
-      - spotify_refreshToken
-      - twitter_consumer_key
-      - twitter_consumer_secret
-      - twitter_access_token
-      - twitter_access_token_secret
+      - SPOTIFY_CLIENT_ID
+      - SPOTIFY_CLIENT_SECRET
+      - SPOTIFY_REDIRECT_URI
+      - SPOTIFY_ACCESS_TOKEN
+      - SPOTIFY_REFRESH_TOKEN
+      - TWITTER_CONSUMER_KEY
+      - TWITTER_CONSUMER_SECRET
+      - TWITTER_ACCESS_TOKEN
+      - TWITTER_ACCESS_TOKEN_SECRET
       - PGHOST
       - PGUSER
       - PGPASSWORD
       - TZ
       - PGTZ
+      - APP_ENV
     depends_on:
       - database
     restart: unless-stopped

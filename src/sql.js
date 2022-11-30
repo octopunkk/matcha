@@ -15,53 +15,54 @@ async function displayMusic() {
   return music;
 }
 
-async function addSong(song, artist, genre, spotify_id, duration_ms) {
-  const xs = await db`
+async function addSong(currentPlayingTrack) {
+  // don't name a variable the same name as your function, this can cause problems -> OK
+  const q = await db`
   insert into music (
     name, artist, genre, spotify_id, duration_ms
   ) values (
-    ${song}, ${artist}, ${genre}, ${spotify_id}, ${duration_ms}
+    ${currentPlayingTrack.name}, ${currentPlayingTrack.artist}, ${currentPlayingTrack.genre}, ${currentPlayingTrack.id}, ${currentPlayingTrack.duration_ms}
   )
   returning *
 `;
-  return xs;
+  return q;
 }
 
 async function getTopArtists(limit, interval) {
+  // interval is a string ? either "week" or "month" ? if yes, why doing `now() - ${1 + interval}` in the SQL query ? you should never add a number to a string, what do you want to do?
+  // `now() - "1 ${interval}"::interval -> OK
   const topArtists = await db`
-  select artist, array_agg(spotify_id) as track_ids, sum(duration_ms) as counting from music
-  where date > now() - ${1 + interval}::interval
+  select artist, array_agg(spotify_id) as track_ids, sum(duration_ms) as listen_duration from music
+  where date > (now() - ${"1 " + interval}::interval)
   group by artist
-  order by counting desc
+  order by listen_duration desc
   limit ${limit};
   `;
-  console.log(topArtists);
   return topArtists.map((artist) => {
     return {
       artist: artist.artist,
-      counting: artist.counting,
+      listen_duration: artist.listen_duration,
       spotify_id: artist.track_ids[0],
     };
   });
-  // topArtists =  [{ artist: 'The Cure', counting: '3' },{ artist: 'Tyler, The Creator', counting: '2' }]
 }
 
 async function getTopTracks(limit, interval) {
   const topTracks = await db`
-  select name, spotify_id, count(*) as counting from music
-  where date > now() -  ${1 + interval}::interval
+  select name, spotify_id, count(*) as track_count from music
+  where date > (now() - ${"1 " + interval}::interval)
   group by name, spotify_id
-  order by counting desc
+  order by track_count desc
   limit ${limit};
   `;
   return topTracks;
 }
 async function getTopGenres(limit, interval) {
   const topGenres = await db`
-  select genre, count(*) as counting from music
-  where date > now() -  ${1 + interval}::interval
+  select genre, count(*) as genre_count from music
+  where date > (now() - ${"1 " + interval}::interval)
   group by genre
-  order by counting desc
+  order by genre_count desc
   limit ${limit};
   `;
   return topGenres;
@@ -69,7 +70,7 @@ async function getTopGenres(limit, interval) {
 async function getListenTime(interval) {
   const listen_time = await db`
   select sum(duration_ms) as listen_time from music
-  where date > now() -  ${1 + interval}::interval;
+  where date > (now() - ${"1 " + interval}::interval);
   `;
   return listen_time;
 }
@@ -77,7 +78,7 @@ async function getListenTime(interval) {
 async function getBusiestHour(interval) {
   const busiest_hour = await db`
   select extract(hour from date) as busiest_hour, sum(duration_ms) as listened_on_count from music
-  where date > now() - ${1 + interval}::interval
+  where date > (now() - ${"1 " + interval}::interval)
   group by busiest_hour
   order by listened_on_count desc
   limit 1;
@@ -87,10 +88,47 @@ async function getBusiestHour(interval) {
 
 async function getSongCount(interval) {
   const songCount = await db`
-  select count(*) as counting from music
-  where date > now() -  ${1 + interval}::interval;
-  `;
+  select count(*) as song_count from music
+  where date > (now() - ${"1 " + interval}::interval);  `;
   return songCount;
+}
+
+async function getLastEntryID() {
+  const lastEntryID = await db`
+  select ID, spotify_id from music
+  order by ID desc
+  limit 1;
+  `;
+  return lastEntryID;
+}
+
+async function getLastSpotifyTokenRefresh() {
+  const lastRefresh = await db`
+  select created_at, token from spotify_token                   
+  order by created_at desc
+  limit 1;
+  `;
+  return lastRefresh;
+}
+
+async function refreshSpotifyToken(newAccessToken) {
+  const q = await db`
+  insert into spotify_token (
+    token
+  ) values (
+    ${newAccessToken}
+  )
+  returning *
+`;
+  return q;
+}
+
+async function deleteObsoleteSpotifyTokens() {
+  const q2 = await db`
+DELETE FROM spotify_token
+where created_at < (now() - '1 hour'::interval);
+`;
+  return q2;
 }
 
 module.exports = {
@@ -102,4 +140,8 @@ module.exports = {
   getListenTime,
   getSongCount,
   getTopGenres,
+  getLastEntryID,
+  refreshSpotifyToken,
+  getLastSpotifyTokenRefresh,
+  deleteObsoleteSpotifyTokens,
 };
