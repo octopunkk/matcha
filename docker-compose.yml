@@ -29,6 +29,7 @@ services:
       - TZ
       - PGTZ
       - APP_ENV
+      - STATS_LANG
     depends_on:
       - database
     restart: unless-stopped
