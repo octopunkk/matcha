@@ -1,20 +1,20 @@
 # Matcha
 
-Matcha is a twitter bot made with node.js. It tweets every song I listen to on spotify.
+Matcha is a Twitter bot made with Node.js. It tweets every song I listen to on Spotify.
 
 The bot also tweets an image with my weekly listening stats every sunday at 6pm, and another with my monthly listening stats every 1st of the month at 12pm.
 
 You can see it in action on my [@AnaisMusicBot account](https://twitter.com/AnaisMusicBot).
 
-It runs on a raspberry pi, with docker-compose. A postgres database stores the histoty of the tracks listened.
+It runs on a Raspberry pi, with Docker-compose. A Postgres database stores the histoty of the tracks listened.
 
 ## Install
 
 To use locally, clone the repo, `docker-compose build` then `docker-compose up`.
 
-You should have [docker](https://www.docker.com/) and [docker compose](https://docs.docker.com/compose/gettingstarted/) installed on your machine.
+You should have [Docker](https://www.docker.com/) and [Docker compose](https://docs.docker.com/compose/gettingstarted/) installed on your machine.
 
-To test new things or debug, you can run the postgres container with `docker-compose up database` and run the bot with node, by using `npm start:local` or `npm start:local:watch` (uses nodemon). This way is faster than rebuilding the image at every change.
+To test new things or debug, you can run the Postgres container with `docker-compose up database` and run the bot with Node, by using `npm start:local` or `npm start:local:watch` (uses Nodemon). This way is faster than rebuilding the image at every change.
 
 Migrations are handled by [ley](https://github.com/lukeed/ley).
 
