@@ -191,7 +191,10 @@ async function handleCurrentPlayingTrack() {
 async function tweetStatsImg(interval) {
   const statsImgBuffer = await generateStatsImg(interval);
   if (statsImgBuffer) {
-    twitter.tweetWithImg("", statsImgBuffer);
+    const text = `📈 Stats ${
+      interval == "month" ? "du mois" : "de la semaine"
+    }`;
+    twitter.tweetWithImg(text, statsImgBuffer);
   }
 }
 
@@ -205,11 +208,11 @@ const loop = async () => {
 };
 loop();
 if (process.env.APP_ENV === "prod") {
-  schedule.scheduleJob("00 12 * * 7", async () => {
+  schedule.scheduleJob("00 18 * * 7", async () => {
     const interval = "week";
     await tweetStatsImg(interval);
   });
-  schedule.scheduleJob("00 9 1 * *", async () => {
+  schedule.scheduleJob("00 12 1 * *", async () => {
     const interval = "month";
     await tweetStatsImg(interval);
   });
