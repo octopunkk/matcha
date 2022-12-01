@@ -2,7 +2,7 @@
 
 Matcha is a twitter bot made with node.js. It tweets every song I listen to on spotify.
 
-The bot also tweets an image with my weekly listening stats every sunday at 6pm, and another with my monthly listening stats every 1st of the month at 9am.
+The bot also tweets an image with my weekly listening stats every sunday at 6pm, and another with my monthly listening stats every 1st of the month at 12pm.
 
 You can see it in action on my [@AnaisMusicBot account](https://twitter.com/AnaisMusicBot).
 
