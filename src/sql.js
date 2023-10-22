@@ -101,7 +101,7 @@ async function getLastEntryID() {
 
 async function getLastSpotifyTokenRefresh() {
   const lastRefresh = await db`
-  select created_at, token from spotify_token                   
+  select created_at, token from spotify_token
   order by created_at desc
   limit 1;
   `;
