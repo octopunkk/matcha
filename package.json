@@ -12,13 +12,13 @@
     "migrate": "ley"
   },
   "dependencies": {
-    "canvas": "^2.10.2",
+    "@koa/router": "^11.0.2",
     "dotenv-cli": "^6.0.0",
-    "node-schedule": "^2.1.0",
+    "koa": "^2.14.2",
+    "koa-bodyparser": "^4.4.1",
     "nodemon": "^2.0.20",
     "postgres": "^3.3.1",
-    "spotify-web-api-node": "^5.0.2",
-    "twit": "^2.2.11"
+    "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {
     "ley": "^0.8.1"

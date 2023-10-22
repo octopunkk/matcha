@@ -1,11 +1,5 @@
-const SpotifyWebApi = require("spotify-web-api-node");
+const { spotifyApi } = require('./spotifyApi');
 const sql = require("./sql");
-
-const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.SPOTIFY_CLIENT_ID,
-  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  redirectUri: process.env.SPOTIFY_REDIRECT_URI || "http://localhost:8888/",
-});
 
 spotifyApi.setAccessToken(process.env.SPOTIFY_ACCESS_TOKEN);
 spotifyApi.setRefreshToken(process.env.SPOTIFY_REFRESH_TOKEN);
